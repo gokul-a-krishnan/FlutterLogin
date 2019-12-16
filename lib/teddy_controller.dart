@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:dio/dio.dart';
 import 'package:flare_flutter/flare.dart';
 import 'package:flare_dart/math/mat2d.dart';
 import 'package:flare_dart/math/vec2d.dart';
@@ -112,6 +114,7 @@ class TeddyController extends FlareControls {
   }
 
   bool _isCoveringEyes = false;
+
   coverEyes(cover) {
     if (_isCoveringEyes == cover) {
       return;
@@ -129,6 +132,22 @@ class TeddyController extends FlareControls {
       play("success");
     } else {
       play("fail");
+    }
+  }
+
+  Future submit(String email, String password) async {
+    Map<String, String> body = {
+      'email': email,
+      'password': password,
+    };
+    Dio dio = Dio();
+    Response response = await dio.post('http://api.studymonk.in:2001/login',
+        data: body,
+        options: Options(contentType: 'application/x-www-form-urlencoded'));
+    if (response.data['code'] == 200) {
+      return await response.data['result'];
+    } else {
+      return 'Bad Request';
     }
   }
 }

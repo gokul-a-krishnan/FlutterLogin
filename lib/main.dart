@@ -12,9 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.green
-      ),
+      theme: ThemeData(primarySwatch: Colors.green),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -31,6 +29,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   TeddyController _teddyController;
+  String email, password;
+
   @override
   initState() {
     _teddyController = TeddyController();
@@ -56,10 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 end: Alignment.bottomLeft,
                 // Add one stop for each color. Stops should increase from 0 to 1
                 stops: [0.0, 1.0],
-                colors: [
-                  Colors.purpleAccent[400],
-                  Colors.purpleAccent[700]
-                ],
+                colors: [Colors.purpleAccent[400], Colors.purpleAccent[700]],
               ),
             ),
           )),
@@ -71,15 +68,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      Text('StudyMONK',
-                      textScaleFactor: 3.0 ,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white,
-                      fontWeight: FontWeight.bold
-                      ),),
+                      Text(
+                        'StudyMONK',
+                        textScaleFactor: 3.0,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
                       Container(
                           height: 200,
-						  padding: const EdgeInsets.only(left: 30.0, right:30.0),
+                          padding:
+                              const EdgeInsets.only(left: 30.0, right: 30.0),
                           child: FlareActor(
                             "assets/Teddy.flr",
                             shouldClip: false,
@@ -100,11 +99,15 @@ class _MyHomePageState extends State<MyHomePage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: <Widget>[
                                 TrackingTextInput(
-                                    label: "Email",
-                                    hint: "What's your email address?",
-                                    onCaretMoved: (Offset caret) {
-                                      _teddyController.lookAt(caret);
-                                    }),
+                                  label: "Email",
+                                  hint: "What's your email address?",
+                                  onCaretMoved: (Offset caret) {
+                                    _teddyController.lookAt(caret);
+                                  },
+                                  onTextChanged: (value) {
+                                    email = value;
+                                  },
+                                ),
                                 TrackingTextInput(
                                   label: "Password",
                                   hint: "Try 'bears'...",
@@ -115,6 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   },
                                   onTextChanged: (String value) {
                                     _teddyController.setPassword(value);
+                                    password = value;
                                   },
                                 ),
                                 SigninButton(
@@ -123,8 +127,26 @@ class _MyHomePageState extends State<MyHomePage> {
                                             fontFamily: "RobotoMedium",
                                             fontSize: 16,
                                             color: Colors.white)),
-                                    onPressed: () {
-                                      _teddyController.submitPassword();
+                                    onPressed: () async {
+                                      var response = await _teddyController
+                                          .submit(email, password);
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: Text('Response'),
+                                              content:
+                                                  Text(response.toString()),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  child: Text('Close'),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                )
+                                              ],
+                                            );
+                                          });
                                     })
                               ],
                             )),
